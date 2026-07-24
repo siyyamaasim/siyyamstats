@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Siyyam Statistics | Population &amp; Development Data Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy-950:#0a1330;
+    --navy-900:#0f1d45;
+    --navy-800:#152a5e;
+    --navy-700:#1e3a75;
+    --violet-600:#7c5cf0;
+    --violet-500:#8f6ff5;
+    --violet-300:#c4b5fd;
+    --lavender-100:#f3f0ff;
+    --lavender-050:#f9f8ff;
+    --ink:#1b1a2b;
+    --muted:#6b6a85;
+    --line:#e6e3f5;
+    --white:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--white);-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.serif{font-family:'Newsreader',Georgia,serif;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+
+  /* ---- Gov top strip ---- */
+  .gov-strip{background:var(--navy-950);color:#c9d0ea;font-size:12px;padding:6px 0;letter-spacing:.02em;}
+  .gov-strip .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;}
+  .gov-strip .url{font-family:'Inter',monospace;color:var(--violet-300);}
+
+  /* ---- Ticker ---- */
+  .ticker-bar{background:linear-gradient(90deg,var(--violet-600),var(--navy-800));overflow:hidden;position:relative;height:34px;display:flex;align-items:center;}
+  .ticker-tag{position:relative;z-index:2;background:var(--navy-950);color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.08em;padding:0 16px;height:34px;display:flex;align-items:center;flex-shrink:0;}
+  .ticker-track{display:flex;white-space:nowrap;animation:tickerScroll 40s linear infinite;}
+  .ticker-track span{color:#fff;font-size:12.5px;font-weight:500;padding:0 34px;display:inline-flex;align-items:center;gap:10px;}
+  .ticker-track span::before{content:"●";color:var(--violet-300);font-size:7px;}
+  @keyframes tickerScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  .ticker-bar:hover .ticker-track{animation-play-state:paused;}
+
+  /* ---- Nav ---- */
+  header.nav{background:var(--navy-900);color:#fff;border-bottom:1px solid rgba(255,255,255,.08);}
+  header.nav .wrap{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--violet-500),var(--violet-600));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;}
+  .brand .name{font-size:15px;font-weight:700;line-height:1.1;}
+  .brand .name small{display:block;font-weight:400;font-size:11px;color:#a6aed6;letter-spacing:.03em;}
+  nav.links{display:flex;gap:8px;font-size:13px;font-weight:600;}
+  nav.links a{color:#c9d0ea;padding:8px 14px;border-radius:8px;transition:background .15s,color .15s;}
+  nav.links a:hover{background:rgba(255,255,255,.08);color:#fff;}
+  nav.links a.current{color:#fff;background:rgba(140,110,240,.22);}
+
+  .subtab-bar{background:var(--lavender-050);border-bottom:1px solid var(--line);padding:14px 0;}
+  .subtab-bar .wrap{display:flex;align-items:center;gap:10px;}
+  .subtab-label{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-right:6px;}
+  .subtab-btn{border:1px solid var(--line);background:#fff;color:var(--navy-800);font-size:13px;font-weight:600;padding:8px 18px;border-radius:999px;cursor:pointer;transition:all .15s;}
+  .subtab-btn.active{background:var(--navy-900);color:#fff;border-color:var(--navy-900);}
+  .subtab-btn:not(.active):hover{border-color:var(--violet-500);color:var(--violet-600);}
+
+  /* ---- Hero ---- */
+  .hero{background:radial-gradient(1200px 500px at 85% -10%, rgba(140,110,240,.35), transparent 60%), linear-gradient(180deg,var(--navy-900),var(--navy-950));color:#fff;padding:52px 0 44px;}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(140,110,240,.18);border:1px solid rgba(196,181,253,.35);color:var(--violet-300);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:6px 14px;border-radius:999px;}
+  .hero h1{font-size:42px;font-weight:500;line-height:1.15;margin:20px 0 10px;max-width:780px;}
+  .hero p.lede{color:#b7bee2;font-size:15.5px;max-width:640px;line-height:1.6;margin-bottom:32px;}
+  .hero-figure{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;}
+  .hero-figure .num{font-family:'Newsreader',serif;font-size:76px;font-weight:500;line-height:1;}
+  .hero-figure .unit{font-size:22px;color:#a6aed6;}
+  .pill-up{background:var(--violet-500);color:#1a1030;font-weight:700;font-size:13px;padding:6px 12px;border-radius:999px;}
+  .hero-caption{color:#8b93bf;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;margin-top:6px;}
+
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;margin-top:36px;}
+  .kpi{background:rgba(255,255,255,.045);padding:22px;}
+  .kpi .v{font-family:'Newsreader',serif;font-size:28px;}
+  .kpi .l{font-size:12px;color:#a6aed6;margin-top:4px;}
+
+  /* ---- Sections ---- */
+  section{padding:56px 0;}
+  section.tint{background:var(--lavender-050);}
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease, transform .6s ease;}
+  .reveal.in{opacity:1;transform:translateY(0);}
+  .section-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--violet-600);margin-bottom:8px;}
+  .section-title{font-size:28px;font-weight:500;margin:0 0 14px;}
+  .section-sub{color:var(--muted);font-size:14.5px;max-width:760px;line-height:1.65;margin-bottom:30px;}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;transition:box-shadow .2s;}
+  .card:hover{box-shadow:0 12px 32px -12px rgba(30,20,80,.18);}
+  .card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--navy-800);margin-bottom:2px;}
+  .card-note{font-size:12px;color:var(--muted);margin-bottom:16px;}
+
+  .grid-2{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;}
+  @media(max-width:900px){.grid-2{grid-template-columns:1fr;}.kpi-row{grid-template-columns:1fr 1fr;}nav.links{display:none;}.hero h1{font-size:32px;}}
+
+  .chart-box{position:relative;height:300px;}
+  .chart-box.tall{height:340px;}
+  canvas{cursor:pointer;}
+
+  .bar-list .item{display:grid;grid-template-columns:220px 1fr 70px;align-items:center;gap:14px;margin-bottom:14px;font-size:13px;padding:4px 6px;border-radius:8px;transition:background .15s;}
+  .bar-list .item:hover{background:var(--lavender-100);}
+  .bar-list .item .label{color:var(--ink);font-weight:500;}
+  .bar-list .track{background:var(--lavender-100);border-radius:6px;height:10px;overflow:hidden;}
+  .bar-list .fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--navy-800),var(--violet-500));transition:width 1s ease;}
+  .bar-list .val{text-align:right;font-variant-numeric:tabular-nums;color:var(--navy-800);font-weight:600;}
+
+  .gm-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px;}
+  .gm-card{border:1px solid var(--line);border-radius:14px;padding:18px;transition:border-color .2s, transform .2s;}
+  .gm-card.active{border-color:var(--violet-500);transform:translateY(-2px);box-shadow:0 10px 26px -12px rgba(124,92,240,.4);}
+  .gm-card .tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;margin-bottom:10px;}
+  .gm-card p{font-size:12.5px;color:var(--muted);line-height:1.5;margin:8px 0 0;}
+  .gm-card .figs{font-size:13px;font-weight:600;color:var(--navy-800);}
+
+  .callout{background:linear-gradient(135deg,var(--navy-900),var(--navy-800));color:#fff;border-radius:16px;padding:24px;}
+  .callout .big{font-family:'Newsreader',serif;font-size:34px;}
+  .callout .lab{color:#a6aed6;font-size:12.5px;margin-top:2px;}
+
+  .notable{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .notable .card h4{margin:0 0 8px;font-size:15px;}
+  .notable .big-pct{font-family:'Newsreader',serif;font-size:30px;color:var(--navy-900);}
+
+  /* ---- Contact ---- */
+  .contact-grid{display:grid;grid-template-columns:200px 1fr;gap:32px;align-items:center;}
+  @media(max-width:760px){.contact-grid{grid-template-columns:1fr;text-align:center;}}
+  .avatar{width:170px;height:170px;border-radius:50%;object-fit:cover;border:4px solid var(--violet-300);display:block;margin:0 auto;background:linear-gradient(135deg,var(--navy-800),var(--violet-600));}
+  .avatar-fallback{width:170px;height:170px;border-radius:50%;background:linear-gradient(135deg,var(--navy-800),var(--violet-600));display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Newsreader',serif;font-size:56px;margin:0 auto;border:4px solid var(--violet-300);}
+  .contact-name{font-family:'Newsreader',serif;font-size:30px;margin:0 0 4px;}
+  .contact-role{color:var(--violet-600);font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px;}
+  .contact-bio{color:var(--muted);font-size:14px;line-height:1.7;max-width:620px;margin-bottom:20px;}
+  .contact-links{display:flex;gap:12px;flex-wrap:wrap;}
+  @media(max-width:760px){.contact-links{justify-content:center;}}
+  .contact-btn{display:inline-flex;align-items:center;gap:9px;padding:11px 20px;border-radius:10px;font-size:13.5px;font-weight:600;transition:transform .15s, box-shadow .15s;}
+  .contact-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(30,20,80,.4);}
+  .btn-linkedin{background:var(--navy-900);color:#fff;}
+  .btn-email{background:var(--lavender-100);color:var(--navy-900);border:1px solid var(--violet-300);}
+
+  footer{background:var(--navy-950);color:#8b93bf;padding:36px 0;font-size:12.5px;}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  footer a.url{color:var(--violet-300);}
+
+  .src{font-size:11.5px;color:var(--muted);margin-top:10px;}
+
+  .empty-state{padding:100px 0;text-align:center;}
+  .empty-state .icon{width:64px;height:64px;border-radius:16px;background:var(--lavender-100);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:26px;}
+  .empty-state h2{font-size:24px;margin:0 0 10px;}
+  .empty-state p{color:var(--muted);font-size:14px;max-width:440px;margin:0 auto;line-height:1.6;}
+
+  #educationTab{display:none;}
+</style>
+</head>
+<body>
+
+<div class="gov-strip">
+  <div class="wrap">
+    <span>Government of Pakistan &nbsp;|&nbsp; Ministry of Planning, Development &amp; Special Initiatives</span>
+    <span class="url">siyyamstatistics.gov.pk</span>
+  </div>
+</div>
+
+<div class="ticker-bar">
+  <div class="ticker-tag">HEADLINES</div>
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<header class="nav">
+  <div class="wrap">
+    <div class="brand">
+      <div class="mark">SS</div>
+      <div class="name">Siyyam Statistics<small>Population &amp; Development Data Research</small></div>
+    </div>
+    <nav class="links">
+      <a href="#" class="current">Home</a>
+      <a href="#" onclick="return false;">Datasets</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="subtab-bar">
+  <div class="wrap">
+    <span class="subtab-label">Home ›</span>
+    <button class="subtab-btn active" id="btnHealth" onclick="showTab('health')">Health</button>
+    <button class="subtab-btn" id="btnEducation" onclick="showTab('education')">Education</button>
+  </div>
+</div>
+
+<div id="healthTab">
+
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Fact Sheet · Federal PSDP · FY 2020–27</span>
+    <h1>Pakistan's Federal Healthcare<br>Development Budget</h1>
+    <p class="lede">Analysis of federal healthcare spending under the Public Sector Development Programme (PSDP), as tagged in the Ministry of Planning's project list under the National Health Services, Regulations &amp; Coordination Division, FY2020‑21 through FY2026‑27.</p>
+
+    <div class="hero-figure">
+      <span class="num">97.3</span>
+      <span class="unit">PKR billion — total federal healthcare PSDP, 7-year window</span>
+      <span class="pill-up">▲ 61.5% infrastructure</span>
+    </div>
+    <div class="hero-caption">239 projects tracked · 47.5% non-infrastructure · 13 projects span both</div>
+
+    <div class="kpi-row">
+      <div class="kpi"><div class="v">239</div><div class="l">Projects, FY2020–27</div></div>
+      <div class="kpi"><div class="v">PKR 619m</div><div class="l">Avg. project size, FY2026‑27</div></div>
+      <div class="kpi"><div class="v">37.2%</div><div class="l">Weighted gender-responsive share</div></div>
+      <div class="kpi"><div class="v">PKR 24.3bn</div><div class="l">Peak year — FY2021‑22</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="trend" class="reveal">
+  <div class="wrap">
+    <div class="section-label">Trend Analysis</div>
+    <h2 class="section-title">Seven-year spending trend</h2>
+    <p class="section-sub">Infrastructure spending (civil works, construction, equipment) versus non-infrastructure / human-capital spending (training, scholarships, disease programmes), by fiscal year, with the number of active projects overlaid.</p>
+    <div class="card">
+      <div class="card-title">Infrastructure vs. Non-Infrastructure Allocation</div>
+      <div class="card-note">PKR billion (bars, left axis) · number of projects (line, right axis)</div>
+      <div class="chart-box tall"><canvas id="trendChart"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<section class="tint reveal">
+  <div class="wrap grid-2">
+    <div class="card">
+      <div class="card-title">Composition by Year</div>
+      <div class="card-note">Infrastructure's share climbed from 43.8% (2020‑21) to a peak of 71.6% (2025‑26)</div>
+      <div class="chart-box tall"><canvas id="compChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Average Project Size</div>
+      <div class="card-note">Total allocation ÷ number of projects, per fiscal year (PKR million)</div>
+      <div class="chart-box tall"><canvas id="avgSizeChart"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<section class="reveal">
+  <div class="wrap">
+    <div class="section-label">Where the Money Goes</div>
+    <h2 class="section-title">Major areas of expenditure</h2>
+    <p class="section-sub">Ranked by allocation, classified by the intended benefit of the spending, FY2020–27 (PKR billion).</p>
+    <div class="card bar-list" id="benefitBars"></div>
+    <div class="src">Source: Federal PSDP Project List FY2020–27 · Ministry of Planning, Development &amp; Special Initiatives</div>
+  </div>
+</section>
+
+<section class="tint reveal" id="gender">
+  <div class="wrap">
+    <div class="section-label">Gender Lens</div>
+    <h2 class="section-title">Reading the budget through a gender marker</h2>
+    <p class="section-sub">Every PSDP project carries a Gender Marker (GEN 1–3), Pakistan's Gender-Responsive Budgeting classification of a project's visible contribution to gender equality and women's empowerment, applied at project level and weighted for portfolio analysis. Click a segment to jump to its definition.</p>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Share of Healthcare PSDP by Gender Marker</div>
+        <div class="card-note">PKR billion allocated per marker</div>
+        <div class="chart-box tall"><canvas id="genderChart"></canvas></div>
+      </div>
+      <div class="callout" style="display:flex;flex-direction:column;justify-content:center;">
+        <div class="lab">Weighted gender-responsive share</div>
+        <div class="big">37.2%</div>
+        <div class="lab">PKR 36.2 bn, weighted across all 239 projects</div>
+        <div style="height:16px;"></div>
+        <div class="lab">GEN 3 · direct women's/girls' benefit</div>
+        <div class="big" style="font-size:26px;">4.4%</div>
+        <div class="lab">PKR 4.3 bn · 13 projects</div>
+      </div>
+    </div>
+    <div class="gm-cards">
+      <div class="gm-card" id="card-gen1">
+        <span class="tag" style="background:var(--lavender-100);color:var(--navy-800);">GEN 1 · weight 20%</span>
+        <div class="figs">27.4% · PKR 26.6 bn · 85 projects</div>
+        <p>Enabling institutional / system support: offices, systems, automation, data centres, labs, research, feasibility or administrative capacity.</p>
+      </div>
+      <div class="gm-card" id="card-gen2">
+        <span class="tag" style="background:var(--violet-300);color:#241a4d;">GEN 2 · weight 40%</span>
+        <div class="figs">68.2% · PKR 66.4 bn · 141 projects</div>
+        <p>Substantive public service / beneficiary pathway: health, education, transport, water, social protection or livelihoods where women are credible beneficiaries.</p>
+      </div>
+      <div class="gm-card" id="card-gen3">
+        <span class="tag" style="background:var(--navy-900);color:#fff;">GEN 3 · weight 100%</span>
+        <div class="figs">4.4% · PKR 4.3 bn · 13 projects</div>
+        <p>Direct gender relevance: explicit women, girls, female beneficiaries, maternal health, GBV/protection, or women-specific facilities.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="portfolio" class="reveal">
+  <div class="wrap">
+    <div class="section-label">Portfolio at a Glance</div>
+    <h2 class="section-title">Projects by sector</h2>
+    <p class="section-sub">The same 239 projects, seen by number of projects rather than by rupee value — a different lens on where PSDP healthcare effort is concentrated. In the yearly chart, darker bars mean more projects.</p>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Project Count by Sector / Category</div>
+        <div class="card-note">Number of projects, FY2020–27</div>
+        <div class="chart-box tall"><canvas id="sectorChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Projects Approved per Year</div>
+        <div class="card-note">Colour intensity scales with the number of projects</div>
+        <div class="chart-box tall"><canvas id="countChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tint reveal" id="quality">
+  <div class="wrap">
+    <div class="section-label">Notable Years</div>
+    <h2 class="section-title">Two years worth flagging</h2>
+    <div class="notable">
+      <div class="card">
+        <h4>2021‑22 — the only near-even year</h4>
+        <div class="big-pct">50.3% <span style="font-size:15px;color:var(--muted);font-weight:400;">infrastructure</span></div>
+        <p style="font-size:13px;color:var(--muted);">vs. 49.7% non‑infrastructure — the closest to parity across the whole FY2020‑27 window; every other year leans infrastructure.</p>
+      </div>
+      <div class="card">
+        <h4>2025‑26 — the infrastructure peak</h4>
+        <div class="big-pct">71.6% <span style="font-size:15px;color:var(--muted);font-weight:400;">of the budget</span></div>
+        <p style="font-size:13px;color:var(--muted);">went to infrastructure — the widest gap between the two categories in the seven‑year dataset.</p>
+      </div>
+    </div>
+    <div class="src">Source: Federal PSDP Project List FY2020–27 · Ministry of Planning, Development &amp; Special Initiatives. Each project title was classified as Infrastructure and/or Non-Infrastructure against a keyword rule set, cross-checked with the Sector/Category field in the PSDP data.</div>
+  </div>
+</section>
+
+<section id="contact" class="reveal">
+  <div class="wrap">
+    <div class="section-label">Contact</div>
+    <h2 class="section-title">Get in touch</h2>
+    <div class="card" style="padding:36px;">
+      <div class="contact-grid">
+        <div>
+          <!-- To use your LinkedIn photo: save it next to this file as "siyyam.jpg".
+               It will load automatically; until then the initials avatar shows. -->
+          <img class="avatar" id="profilePhoto" src="siyyam.jpg" alt="Siyyam Aasim"
+               onerror="this.style.display='none';document.getElementById('avatarFallback').style.display='flex';">
+          <div class="avatar-fallback" id="avatarFallback" style="display:none;">SA</div>
+        </div>
+        <div>
+          <h3 class="contact-name">Siyyam Aasim</h3>
+          <div class="contact-role">Population &amp; Development Data Research</div>
+          <p class="contact-bio">
+            Researcher working at the intersection of public budgets, population dynamics and development
+            outcomes in Pakistan. This portal collects fact sheets built from primary government budget
+            documents — federal PSDP project lists and provincial Annual Budget Statements — classified
+            project-by-project and read through lenses like infrastructure vs. human capital and
+            gender-responsive budgeting. Open to collaboration on health, education and population
+            data work.
+          </p>
+          <div class="contact-links">
+            <a class="contact-btn btn-linkedin" href="https://www.linkedin.com/in/siyyamaasim" target="_blank" rel="noopener">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+              linkedin.com/in/siyyamaasim
+            </a>
+            <a class="contact-btn btn-email" href="mailto:Siyyam.aasim@gmail.com">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              Siyyam.aasim@gmail.com
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /healthTab -->
+
+<div id="educationTab">
+  <div class="wrap empty-state">
+    <div class="icon">🎓</div>
+    <h2>Education data coming soon</h2>
+    <p>This tab is reserved for the federal PSDP Education sector fact sheet — allocations, enrolment-linked programmes, and gender markers, in the same format as the Health dashboard.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>© Siyyam Statistics — Population &amp; Development Data Research. Illustrative fact sheet for analysis.</span>
+    <span class="url">siyyamstatistics.gov.pk/home/health</span>
+  </div>
+</footer>
+
+<script>
+const NAVY_D='#0f1d45', VIOLET='#7c5cf0', VIOLET_L='#c4b5fd', GRID='#eceafc', MUTED='#8a89a8';
+Chart.defaults.font.family="'Inter',system-ui,sans-serif";
+Chart.defaults.color=MUTED;
+Chart.defaults.font.size=12;
+Chart.defaults.animation.duration=900;
+Chart.defaults.animation.easing='easeOutQuart';
+
+const years=['2020-21','2021-22','2022-23','2023-24','2024-25','2025-26','2026-27'];
+const infra=[5.30,12.21,7.53,6.98,9.86,9.34,8.64];
+const noninfra=[6.80,12.07,6.07,5.60,7.64,3.70,4.36];
+const counts=[46,42,37,35,37,21,21];
+const infraPct=[43.8,50.3,55.4,55.5,56.4,71.6,66.4];
+const avgSize=[258.8,488.8,313.4,282.2,469.0,621.1,619.0];
+
+/* Custom plugin: draw GEN labels outside the doughnut arcs */
+const arcLabels = {
+  id:'arcLabels',
+  afterDatasetsDraw(chart, args, opts){
+    if(!opts || !opts.labels) return;
+    const {ctx} = chart;
+    const meta = chart.getDatasetMeta(0);
+    meta.data.forEach((arc, i)=>{
+      const label = opts.labels[i];
+      if(!label) return;
+      const mid = (arc.startAngle + arc.endAngle)/2;
+      const r = arc.outerRadius + 16;
+      const x = arc.x + Math.cos(mid)*r;
+      const y = arc.y + Math.sin(mid)*r;
+      // leader line
+      ctx.save();
+      ctx.strokeStyle = '#c9c6e0';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(arc.x + Math.cos(mid)*(arc.outerRadius+2), arc.y + Math.sin(mid)*(arc.outerRadius+2));
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.font = '700 12px Inter, sans-serif';
+      ctx.fillStyle = '#0f1d45';
+      ctx.textAlign = Math.cos(mid) >= 0 ? 'left' : 'right';
+      ctx.textBaseline = 'middle';
+      const pad = Math.cos(mid) >= 0 ? 4 : -4;
+      ctx.fillText(label, x + pad, y);
+      ctx.restore();
+    });
+  }
+};
+Chart.register(arcLabels);
+
+/* ---------------- Trend chart ---------------- */
+new Chart(document.getElementById('trendChart'),{
+  data:{labels:years,datasets:[
+    {type:'bar',label:'Infrastructure (PKR bn)',data:infra,backgroundColor:NAVY_D,borderRadius:4,order:2,yAxisID:'y'},
+    {type:'bar',label:'Non-Infrastructure (PKR bn)',data:noninfra,backgroundColor:VIOLET,borderRadius:4,order:2,yAxisID:'y'},
+    {type:'line',label:'Projects (count)',data:counts,borderColor:'#e08a3c',backgroundColor:'#e08a3c',borderWidth:2,pointRadius:4,pointHoverRadius:8,tension:.35,yAxisID:'y1',order:1}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{
+      arcLabels:false,
+      legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8}},
+      tooltip:{callbacks:{
+        title:(items)=>'Fiscal Year '+items[0].label,
+        afterBody:(items)=>{
+          const i=items[0].dataIndex;
+          const total=(infra[i]+noninfra[i]).toFixed(1);
+          return ['Total: PKR '+total+'bn','Infrastructure share: '+infraPct[i].toFixed(1)+'%'];
+        }
+      }}
+    },
+    scales:{
+      x:{stacked:true,grid:{display:false}},
+      y:{stacked:true,beginAtZero:true,title:{display:true,text:'PKR billion'},grid:{color:GRID}},
+      y1:{position:'right',beginAtZero:true,min:0,max:50,ticks:{stepSize:10},grid:{display:false},title:{display:true,text:'Projects'}}
+    }}
+});
+
+/* ---------------- Composition chart ---------------- */
+new Chart(document.getElementById('compChart'),{
+  type:'bar',
+  data:{labels:years,datasets:[
+    {label:'Infrastructure %',data:infraPct,backgroundColor:NAVY_D,borderRadius:4},
+    {label:'Non-Infrastructure %',data:infraPct.map(v=>100-v),backgroundColor:VIOLET_L,borderRadius:4}
+  ]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{arcLabels:false,legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8}},
+      tooltip:{callbacks:{
+        title:(items)=>'Fiscal Year '+items[0].label,
+        label:(c)=>c.dataset.label+': '+c.parsed.x.toFixed(1)+'%'
+      }}},
+    scales:{x:{stacked:true,beginAtZero:true,max:100,grid:{color:GRID},ticks:{callback:v=>v+'%'}},y:{stacked:true,grid:{display:false}}}}
+});
+
+/* ---------------- Average project size ---------------- */
+new Chart(document.getElementById('avgSizeChart'),{
+  type:'line',
+  data:{labels:years,datasets:[{label:'Avg. project size (PKR m)',data:avgSize,borderColor:VIOLET,backgroundColor:'rgba(124,92,240,.15)',fill:true,tension:.35,pointRadius:4,pointHoverRadius:8,pointBackgroundColor:NAVY_D}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{arcLabels:false,legend:{display:false},
+      tooltip:{callbacks:{
+        title:(items)=>'Fiscal Year '+items[0].label,
+        label:(c)=>'PKR '+c.parsed.y.toFixed(0)+'m per project',
+        afterBody:(items)=>'Across '+counts[items[0].dataIndex]+' projects'
+      }}},
+    scales:{y:{title:{display:true,text:'PKR million'},grid:{color:GRID}},x:{grid:{display:false}}}}
+});
+
+/* ---------------- Gender donut with GEN labels ---------------- */
+const genderCardIds=['card-gen2','card-gen1','card-gen3'];
+new Chart(document.getElementById('genderChart'),{
+  type:'doughnut',
+  data:{labels:['GEN 2 · Substantive pathway','GEN 1 · Enabling / institutional','GEN 3 · Direct gender relevance'],
+    datasets:[{data:[66.39,26.64,4.28],backgroundColor:[VIOLET,'#3a5390',NAVY_D],borderWidth:0,hoverOffset:14}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'58%',
+    layout:{padding:{left:46,right:46,top:10,bottom:10}},
+    onClick:(evt,elements)=>{
+      if(!elements.length) return;
+      document.querySelectorAll('.gm-card').forEach(c=>c.classList.remove('active'));
+      const el=document.getElementById(genderCardIds[elements[0].index]);
+      if(el){el.classList.add('active');el.scrollIntoView({behavior:'smooth',block:'center'});}
+    },
+    plugins:{
+      arcLabels:{labels:['GEN 2 · 68.2%','GEN 1 · 27.4%','GEN 3 · 4.4%']},
+      legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8,font:{size:11.5}}},
+      tooltip:{callbacks:{label:(c)=>'PKR '+c.parsed.toFixed(1)+'bn'}}
+    }}
+});
+
+/* ---------------- Sector donut ---------------- */
+const sectorCounts=[
+  ['Health and Nutrition',104],
+  ['Digital, Data and Systems',46],
+  ['Other Public Service Delivery',33],
+  ['Research, Science and Innovation',17],
+  ['Admin. Buildings and Facilities',16],
+  ['Women-Specific Facilities',13],
+  ['Governance and Institutional',6],
+  ['Social Protection & Livelihoods',4]
+];
+new Chart(document.getElementById('sectorChart'),{
+  type:'doughnut',
+  data:{labels:sectorCounts.map(d=>d[0]+' ('+d[1]+')'),
+    datasets:[{data:sectorCounts.map(d=>d[1]),backgroundColor:[NAVY_D,'#294a8f',VIOLET,'#a48ef2',VIOLET_L,'#8a89a8','#c8c6db','#e3e1f0'],borderWidth:0,hoverOffset:14}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'55%',
+    plugins:{arcLabels:false,
+      legend:{position:'right',labels:{usePointStyle:true,boxWidth:8,font:{size:10.5}}},
+      tooltip:{callbacks:{label:(c)=>c.parsed+' projects ('+(c.parsed/239*100).toFixed(1)+'%)'}}}}
+});
+
+/* ---------------- Projects per year, intensity-scaled ---------------- */
+const minC=Math.min(...counts), maxC=Math.max(...counts);
+// light violet (196,181,253) -> deep navy (10,19,48)
+const intensityColors = counts.map(c=>{
+  const t=(c-minC)/(maxC-minC);
+  const r=Math.round(196+(10-196)*t);
+  const g=Math.round(181+(19-181)*t);
+  const b=Math.round(253+(48-253)*t);
+  return `rgb(${r},${g},${b})`;
+});
+new Chart(document.getElementById('countChart'),{
+  type:'bar',
+  data:{labels:years,datasets:[{label:'Projects',data:counts,backgroundColor:intensityColors,borderRadius:6,maxBarThickness:44}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{arcLabels:false,legend:{display:false},
+      tooltip:{callbacks:{
+        title:(items)=>'Fiscal Year '+items[0].label,
+        label:(c)=>c.parsed.y+' projects',
+        afterBody:(items)=>'Avg. size: PKR '+avgSize[items[0].dataIndex].toFixed(0)+'m'
+      }}},
+    scales:{y:{beginAtZero:true,grid:{color:GRID},title:{display:true,text:'Number of projects'}},x:{grid:{display:false}}}}
+});
+
+/* ---------------- Benefit category bar list ---------------- */
+const benefits=[
+  ['Health service access and outcomes',56.93],
+  ['Knowledge / research or testing capacity',10.93],
+  ['Institutional / system strengthening',9.68],
+  ['General public-service access',9.33],
+  ['Administrative or staff facility',4.34],
+  ["Direct women's/girls' or maternal-health benefit",4.28],
+  ['Institutional / governance strengthening',1.69],
+  ['Social protection, livelihoods or regional equity',0.14]
+];
+const maxB=benefits[0][1];
+const container=document.getElementById('benefitBars');
+benefits.forEach(([label,val])=>{
+  const pct=(val/maxB*100).toFixed(1);
+  const share=(val/97.31*100).toFixed(1);
+  const row=document.createElement('div');
+  row.className='item';
+  row.title=`PKR ${val.toFixed(1)}bn — ${share}% of the PKR 97.3bn portfolio`;
+  row.innerHTML=`
+      <div class="label">${label}</div>
+      <div class="track"><div class="fill" style="width:0%" data-w="${pct}"></div></div>
+      <div class="val">${val.toFixed(1)}</div>`;
+  container.appendChild(row);
+});
+
+/* ---------------- Ticker headlines ---------------- */
+const headlines=[
+  "PKR 97.3 billion committed to federal healthcare PSDP projects across FY2020–27",
+  "Infrastructure's share climbs to 71.6% in FY2025-26 — the widest gap in seven years",
+  "FY2021-22 remains the peak spending year at PKR 24.3bn",
+  "37.2% of healthcare PSDP spending is weighted gender-responsive (PKR 36.2bn)",
+  "Average project size roughly doubles: PKR 259m (2020-21) → PKR 619m (2026-27)",
+  "Health and Nutrition leads with 104 of 239 projects",
+  "Only 13 projects — PKR 4.3bn — carry a direct women's/girls' benefit (GEN 3)",
+  "Project count halves from 46 (FY2020-21) to 21 (FY2026-27) as schemes grow larger"
+];
+const track=document.getElementById('tickerTrack');
+const tickerHTML=headlines.map(h=>`<span>${h}</span>`).join('');
+track.innerHTML=tickerHTML+tickerHTML;
+
+/* ---------------- Tabs ---------------- */
+function showTab(tab){
+  document.getElementById('healthTab').style.display = tab==='health' ? 'block' : 'none';
+  document.getElementById('educationTab').style.display = tab==='education' ? 'block' : 'none';
+  document.getElementById('btnHealth').classList.toggle('active', tab==='health');
+  document.getElementById('btnEducation').classList.toggle('active', tab==='education');
+}
+
+/* ---------------- Scroll reveal ---------------- */
+const io=new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){entry.target.classList.add('in');io.unobserve(entry.target);}
+  });
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+const barListSection=document.getElementById('benefitBars').closest('.reveal');
+const io2=new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      document.querySelectorAll('.bar-list .fill').forEach(f=>{f.style.width=f.dataset.w+'%';});
+      io2.disconnect();
+    }
+  });
+},{threshold:0.2});
+if(barListSection) io2.observe(barListSection);
+</script>
+
+</body>
+</html>
